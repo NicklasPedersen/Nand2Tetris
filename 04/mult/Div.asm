@@ -1,0 +1,22 @@
+    @R2
+    M=0
+    @R0
+    D=M
+    @end
+    D;JLE
+    @R1
+    D=M
+    @R0
+    M=M-D
+(mul)
+    @R2
+    M=M+1
+    @R1
+    D=M
+    @R0
+    MD=M-D
+    @mul
+    D;JGT
+(end)
+    @end
+    0;JMP

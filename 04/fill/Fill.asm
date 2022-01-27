@@ -1,0 +1,40 @@
+(bkey)
+    @KBD
+    D=M
+    @bkey
+    D;JLE
+(black)
+    @SCREEN
+    D=A
+(blackloop)
+    A=D
+    M=-1
+    D=A+1
+    @KBD
+    D=D-A
+    @wkey
+    D;JGE
+    @KBD
+    D=D+A
+    @blackloop
+    0;JMP
+(wkey)
+    @KBD
+    D=M
+    @wkey
+    D;JGT
+(white)
+    @SCREEN
+    D=A
+(whiteloop)
+    A=D
+    M=0
+    D=A+1
+    @KBD
+    D=D-A
+    @bkey
+    D;JGE
+    @KBD
+    D=D+A
+    @whiteloop
+    0;JMP
