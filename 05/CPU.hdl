@@ -1,0 +1,168 @@
+// // This file is part of www.nand2tetris.org
+// // and the book "The Elements of Computing Systems"
+// // by Nisan and Schocken, MIT Press.
+// // File name: projects/05/CPU.hdl
+
+// /**
+//  * The Hack CPU (Central Processing unit), consisting of an ALU,
+//  * two registers named A and D, and a program counter named PC.
+//  * The CPU is designed to fetch and execute instructions written in 
+//  * the Hack machine language. In particular, functions as follows:
+//  * Executes the inputted instruction according to the Hack machine 
+//  * language specification. The D and A in the language specification
+//  * refer to CPU-resident registers, while M refers to the external
+//  * memory location addressed by A, i.e. to Memory[A]. The inM input 
+//  * holds the value of this location. If the current instruction needs 
+//  * to write a value to M, the value is placed in outM, the address 
+//  * of the target location is placed in the addressM output, and the 
+//  * writeM control bit is asserted. (When writeM==0, any value may 
+//  * appear in outM). The outM and writeM outputs are combinational: 
+//  * they are affected instantaneously by the execution of the current 
+//  * instruction. The addressM and pc outputs are clocked: although they 
+//  * are affected by the execution of the current instruction, they commit 
+//  * to their new values only in the next time step. If reset==1 then the 
+//  * CPU jumps to address 0 (i.e. pc is set to 0 in next time step) rather 
+//  * than to the address resulting from executing the current instruction. 
+//  */
+
+// CHIP CPU {
+
+//     IN  inM[16],         // M value input  (M = contents of RAM[A])
+//         instruction[16], // Instruction for execution
+//         reset;           // Signals whether to re-start the current
+//                          // program (reset==1) or continue executing
+//                          // the current program (reset==0).
+
+//     OUT outM[16],        // M value output
+//         writeM,          // Write to M? 
+//         addressM[15],    // Address in data memory (of M)
+//         pc[15];          // address of next instruction
+
+//     PARTS:
+//     // Put your code here:
+//     Mux16(a=instruction, b=aluout, sel=instruction[16], out=ainput);
+//     // REGISTER A
+//     Register(in=ainput, load=instruction[5], out=aout, out=addressM);
+
+//     Mux16(a=aout, b=inM, sel=instruction[12], out=aorm);
+
+//     // REGISTER D
+//     Register(in=aluout, load=instruction[4], out=dout);
+
+//     ALU(x=aorm, y=dout, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8], f=instruction[7], no=instruction[6], out=aluout, zr=zero, ng=negative);
+
+
+//     PC(in=aout, load=, inc=, reset=reset, out=pc);
+// }
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/05/CPU.hdl
+
+/**
+ * The Hack CPU (Central Processing unit), consisting of an ALU,
+ * two registers named A and D, and a program counter named PC.
+ * The CPU is designed to fetch and execute instructions written in 
+ * the Hack machine language. In particular, functions as follows:
+ * Executes the inputted instruction according to the Hack machine 
+ * language specification. The D and A in the language specification
+ * refer to CPU-resident registers, while M refers to the external
+ * memory location addressed by A, i.e. to Memory[A]. The inM input 
+ * holds the value of this location. If the current instruction needs 
+ * to write a value to M, the value is placed in outM, the address 
+ * of the target location is placed in the addressM output, and the 
+ * writeM control bit is asserted. (When writeM==0, any value may 
+ * appear in outM). The outM and writeM outputs are combinational: 
+ * they are affected instantaneously by the execution of the current 
+ * instruction. The addressM and pc outputs are clocked: although they 
+ * are affected by the execution of the current instruction, they commit 
+ * to their new values only in the next time step. If reset==1 then the 
+ * CPU jumps to address 0 (i.e. pc is set to 0 in next time step) rather 
+ * than to the address resulting from executing the current instruction. 
+ */
+
+CHIP CPU {
+
+    IN  inM[16],         // M value input  (M = contents of RAM[A])
+        instruction[16], // Instruction for execution
+        reset;           // Signals whether to re-start the current
+                         // program (reset==1) or continue executing
+                         // the current program (reset==0).
+
+    OUT outM[16],        // M value output
+        writeM,          // Write to M? 
+        addressM[15],    // Address in data memory (of M)
+        pc[15];          // address of next instruction
+
+    PARTS:
+    // Put your code here:
+    
+    
+    // Bit-number:      15,              14, 13 ,    12 ,    11, 10,  9,  8,  7,  6,   5,   4,   3,   2,   1,   0 
+    // C ==>             i,              --, -- ,     a ,    c1, c2, c3, c4, c5, c6,  d1,  d2,  d3,  j1,  j2,  j3
+    //                                          , Y=A/M ,    zx, nx, zy, ny,  f, no,   A,   D,   M, R<0, R=0, R>0
+    // A ==>             i,              a1, a2 ,    a3 ,    a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15
+    //                                                                            load A,   D,   Mmmmmmmmmmmmmmmm, thicc, these bitches are
+
+    // bit 15 controls if it is an A or C instruction.
+    // bit 14,13 are ignored for C instruction.
+    // a makes the y input of ALU either A or M.
+    // c1...c6 are control bits to the ALU.
+    // d1..d3 controls the destination of computation. A,M,D or any combination of the three.
+    // j1..j3 controls which type of jump to use (JNE,JEQ,JLE,JGE,JMP,JLT,JGT,null)
+
+    // The first Mux takes either instruction or ALU output from previous cycle.
+    Mux16(a=instruction,b=aluout,sel=instruction[15],out=instruct);
+
+    // if MSB (bit 15) is OFF then we should load into the A register.
+    // because this is an A-instruction.
+    Not(in=instruction[15], out=ainstr);
+    // we should also load into the a register if it's a C-instruction and
+    // bit 5 is ON
+    Or(a=ainstr, b=instruction[5], out=loada);
+
+    // A Register
+    // If i is OFF populate the A-register.
+    ARegister(in=instruct, load=loada, out=aout, out[0..14]=addressM);
+    
+    // If its a C instruction and destination D, which is instruction4 is both ON, then load D
+    And(a=instruction[4], b=instruction[15], out=loadd);
+
+    // D Register
+    // The D-register should be loaded if d2 is ON
+    DRegister(in=aluout, load=loadd, out=dout);
+    
+    // based on bit a, A or M will be output (used as y in ALU)
+    Mux16(a=aout,b=inM,sel=instruction[12],out=aorm);
+    
+    // Figure out in all JUMP scenarios if we should jump.
+    // If we should then we should "load" the program counter.gr
+    And(a=zero, b=instruction[1], out=zerojump); // if zr from ALU and j2 = 1 = JEQ 
+    And(a=negative, b=instruction[2], out=negjump); // if ng from ALU and j1 = 1 = JLT
+    Or(a=negative, b=zero, out=zeroorneg);
+    Not(in=zeroorneg, out=positive);
+    And(a=positive, b=instruction[0], out=posjump); // if positive and j3 = 1 = JGT
+    Or(a=zerojump, b=negjump, out=maybejump);
+    Or(a=maybejump, b=posjump, out=shouldjump);
+
+    // Only a C-instruction can "JUMP"
+    And(a=instruction[15], b=shouldjump, out=shouldactuallyjumpthistime);
+
+    // Program counter
+    // inc is always true because the load flag takes priority in the PC.
+    // pog 
+    PC(in=aout, load=shouldactuallyjumpthistime, inc=true, reset=reset, out[0..14]=pc);
+
+    // zr => zero result
+    // ng => negative result
+    ALU(x=dout,y=aorm,zx=instruction[11],nx=instruction[10],zy=instruction[9],ny=instruction[8],f=instruction[7],no=instruction[6],out=aluout,out=outM,zr=zero,ng=negative);
+    
+    // if C instruction and destination bit 3 (M)
+    And(a=instruction[15], b=instruction[3], out=writeM);
+
+    //Created by:
+    // Bonjomin Damping Pøstrig
+    // Lukaaasen Teltmand Saebelim Testen
+    // Niblas Petorsan 
+    // Nikkie Godtliv. Hackermans
+}
