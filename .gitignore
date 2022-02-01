@@ -1,4 +1,8 @@
 *.tst
 *.cmp
 *.out
-*.hack
+01/*.hack
+02/*.hack
+03/*.hack
+04/*.hack
+05/*.hack
