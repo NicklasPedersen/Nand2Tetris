@@ -1,0 +1,99 @@
+class Main {
+    function void main() {
+        var Array x, y;
+
+        let x = Array.new(4);
+        let y = Array.new(4);
+
+        let x[0] = 0;
+        let x[1] = 1;
+        let x[2] = 2;
+        let x[3] = 3;
+        let y[0] = 0;
+        let y[1] = 0;
+        let y[2] = 0;
+        let y[3] = 0;
+        do Output.printString("\"hello\"");
+
+        // do Main.drawShape(0, 0, 0);
+        // do Main.drawShape(1, 0, 5);
+        // do Main.drawShape(2, 2, 2);
+        // do Main.drawShape(3, 2, 7);
+        // do Main.drawShape(4, 4, 0);
+        // do Main.drawShape(5, 4, 5);
+        // do Main.drawShape(6, 6, 2);
+
+        do Main.drawThatShit(x, y);
+        
+
+
+        return;
+    }
+
+    function void drawSquare(int x, int y) {
+        var int real_x, real_y;
+        var int len;
+        let len = 12;
+        let real_x = Math.multiply(x, 51);
+        let real_y = Math.multiply(y, len);
+        do Screen.drawRectangle(real_x, real_y, real_x + 50, real_y + len - 1);
+        return;
+    }
+
+    function void drawThatShit(Array x, Array y) {
+        var int i;
+        let i = 0;
+        while (i < 4) {
+            do Main.drawSquare(x[i], y[i]);
+            let i = i + 1;
+        }
+        return;
+    }
+
+    function void drawShape(int shapeNum, int x, int y) {
+        if (shapeNum = 0) {
+            do Main.drawSquare(x, y);
+            do Main.drawSquare(x+1, y);
+            do Main.drawSquare(x+2, y);
+            do Main.drawSquare(x+3, y);
+        }
+        if (shapeNum = 1) {
+            do Main.drawSquare(x, y);
+            do Main.drawSquare(x+1, y);
+            do Main.drawSquare(x+1, y+1);
+            do Main.drawSquare(x+2, y+1);
+        }
+        if (shapeNum = 2) {
+            do Main.drawSquare(x, y+1);
+            do Main.drawSquare(x+1, y+1);
+            do Main.drawSquare(x+1, y);
+            do Main.drawSquare(x+2, y);
+        }
+        if (shapeNum = 3) {
+            do Main.drawSquare(x, y);
+            do Main.drawSquare(x, y+1);
+            do Main.drawSquare(x+1, y+1);
+            do Main.drawSquare(x+1, y);
+        }
+        if (shapeNum = 4) {
+            do Main.drawSquare(x, y);
+            do Main.drawSquare(x+1, y);
+            do Main.drawSquare(x+1, y+1);
+            do Main.drawSquare(x+2, y);
+        }
+        if (shapeNum = 5) {
+            do Main.drawSquare(x, y);
+            do Main.drawSquare(x, y+1);
+            do Main.drawSquare(x+1, y);
+            do Main.drawSquare(x+2, y);
+        }
+        if (shapeNum = 6) {
+            do Main.drawSquare(x, y);
+            do Main.drawSquare(x, y+1);
+            do Main.drawSquare(x+1, y+1);
+            do Main.drawSquare(x+2, y+1);
+        }
+
+        return;
+    }
+}
